@@ -30,6 +30,5 @@ import { readFileSync } from 'fs';
     console.log('🏷️ Edition Drop Metadata:', metadata);
   } catch (err) {
     console.error('❌ Failed to deploy editionDrop contract', err);
-    process.exit(1);
   }
 })();
