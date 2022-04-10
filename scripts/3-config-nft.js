@@ -18,6 +18,5 @@ const editionDrop = sdk.getEditionDrop(
     console.log('✅ Successfully add a new NFT in the drop');
   } catch (err) {
     console.error('❌ Failed to create NFT', err);
-    process.exit(1);
   }
 })();
