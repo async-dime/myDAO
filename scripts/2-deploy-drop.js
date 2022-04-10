@@ -6,11 +6,11 @@ import { readFileSync } from 'fs';
   try {
     const editionDropAddress = await sdk.deployer.deployEditionDrop({
       // The collection's name
-      name: 'Ultima MyDAO Pass',
+      name: 'MyDAO Obelisk Chamber',
       // The collection's description
       description: 'A DAO for self-govern individuals',
       // The image that will be held on our NFT!
-      image: readFileSync('scripts/assets/edition-drop.png'),
+      image: readFileSync('scripts/assets/obelisk.png'),
       // We need to pass in the address of the person who will be receiving the proceeds from sales of nfts in the contract.
       // We're planning on not charging people for the drop, so we'll pass in the 0x0 address
       // you can set this to your own wallet address if you want to charge for the drop

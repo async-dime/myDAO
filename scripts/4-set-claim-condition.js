@@ -2,13 +2,13 @@ import sdk from './1-initialize-sdk.js';
 import { MaxUint256 } from '@ethersproject/constants';
 
 const editionDrop = sdk.getEditionDrop(
-  '0x8514E0658699Be7C6c73Cc7f7B173357BDF36604'
+  '0x95d12CBe32b6442BB278534b0D390002F4d2a888'
 );
 
 (async () => {
   try {
     // We define our claim condition, this is an array of objects because
-    // we can have multiple conditions.
+    // if we want we can have multiple phases starting at different times
     const claimConditions = [
       {
         // When people are gonna be able to start claiming, the nft (now)
