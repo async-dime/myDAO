@@ -1,5 +1,10 @@
-import { useAddress, useMetamask, useEditionDrop } from '@thirdweb-dev/react';
-import { useState, useEffect } from 'react';
+import {
+  useAddress,
+  useMetamask,
+  useEditionDrop,
+  useToken,
+} from '@thirdweb-dev/react';
+import { useState, useEffect, useMemo } from 'react';
 import Confirmed from './components/Confirmed';
 
 const App = () => {
@@ -8,14 +13,80 @@ const App = () => {
   const connectWithMetamask = useMetamask();
   console.log('👋 Address:', address);
 
-  // Initialize the editionDrop contract
+  // Initialize the ERC-1155 MyDAO Obelisk Chamber Edition Drop contract
   const editionDrop = useEditionDrop(
     '0x95d12CBe32b6442BB278534b0D390002F4d2a888'
   );
+  // Initialize the ERC-20 MyDAO Ultima Token contract
+  const token = useToken('0x0Ca930033857Da238C4cF518Bb2e58F23d2178b6');
   // state variable to know if user has our nft
   const [hasNFT, setHasNFT] = useState(false);
   // isClaiming lets us easily keep a loading state while the nft is minting
   const [isClaiming, setIsClaiming] = useState(false);
+  // Holds the amount of token each member has in state
+  const [memberTokenAmounts, setMemberTokenAmounts] = useState([]);
+  // The array holding all of our members addresses
+  const [memberAddresses, setMemberAddresses] = useState([]);
+
+  // shortening wallet address
+  const shortenAddress = (str) => {
+    return str.substring(0, 6) + '...' + str.substring(str.length - 4);
+  };
+
+  // Grabs the addresses of our members holding NFT
+  useEffect(() => {
+    if (!hasNFT) {
+      return;
+    }
+
+    // Just like we did in the 7-airdrop-token.js file, grab the users who had our nft
+    // with tokenId 0
+    const getAllAddresses = async () => {
+      try {
+        const memberAddresses =
+          await editionDrop.history.getAllClaimerAddresses(0);
+        setMemberAddresses(memberAddresses);
+        console.log('🕯️ Member Addresses:', memberAddresses);
+      } catch (err) {
+        console.error('❌ Failed to get member list', err);
+      }
+    };
+    getAllAddresses();
+  }, [hasNFT, editionDrop.history]);
+
+  useEffect(() => {
+    if (!hasNFT) {
+      return;
+    }
+
+    const getAllBalances = async () => {
+      try {
+        const amounts = await token.history.getAllHolderBalances();
+        setMemberTokenAmounts(amounts);
+        console.log('👛 Amounts', amounts);
+      } catch (err) {
+        console.error('❌ Failed to get member balances', err);
+      }
+    };
+    getAllBalances();
+  }, [hasNFT, token.history]);
+
+  // Combine the memberAddresses and memberTokenAmounts into a single array
+  const memberList = useMemo(() => {
+    return memberAddresses.map((address) => {
+      // Checking if we find the address in the memberTokenAmounts array
+      // if yes, return amount the user has
+      // if no, return 0
+      const member = memberTokenAmounts?.find(
+        ({ holder }) => holder === address
+      );
+
+      return {
+        address,
+        tokenAmount: member?.balance.displayValue || '0',
+      };
+    });
+  }, [memberAddresses, memberTokenAmounts]);
 
   useEffect(() => {
     // if they don't have connected wallet, exit
@@ -31,7 +102,9 @@ const App = () => {
           console.log('🪖 This warrior has a Pledge for Everydays NFT');
         } else {
           setHasNFT(false);
-          console.log('🗿 This user does not have a Pledge for Everydays NFT, yet');
+          console.log(
+            '🗿 This user does not have a Pledge for Everydays NFT, yet'
+          );
         }
       } catch (err) {
         setHasNFT(false);
@@ -70,11 +143,36 @@ const App = () => {
     );
   }
 
+  // If the user has already claimed the nft we want to display the internal DAO page to them
+  // only DAO members will see this. Render all the members + token amounts
   if (hasNFT) {
     return (
       <div className="member-page">
-        <h1>You are a member of MyDAO!</h1>
+        <h1 className="">Hi, from MyDAO.</h1>
         <Confirmed />
+        <div>
+          <div>
+            <h2>Member List</h2>
+            <table className="card">
+              <thead>
+                <tr>
+                  <th>Address</th>
+                  <th>Token Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {memberList.map((member) => {
+                  return (
+                    <tr key={member.address}>
+                      <td>{shortenAddress(member.address)}</td>
+                      <td>{member.tokenAmount}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     );
   }
