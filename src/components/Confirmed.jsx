@@ -35,7 +35,7 @@ export default function Confirmed() {
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center' }}>
-      <div style={{ height: '20rem', width: '20rem' }}>
+      <div style={{ height: '10rem', width: '10rem' }}>
         <CircularProgressbarWithChildren
           value={percentage}
           styles={buildStyles({

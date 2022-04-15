@@ -4,7 +4,7 @@ body {
   font-family: Inter, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #7700ee;
+  background-color: #3B79FA;
   color: #fff;
   overflow-x: hidden;
 }
@@ -21,6 +21,10 @@ h1 {
   h1 {
     font-size: 3rem;
   }
+}
+
+h2 {
+  font-family: Orotund, sans-serif;
 }
 
 .unsupported-network {
